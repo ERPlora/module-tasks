@@ -1,0 +1,242 @@
+{% load djicons i18n static %}
+
+<div class="p-4" x-data="tasksCalendar({{ current_year }}, {{ current_month }}, '{{ today }}')" x-init="fetchTasks()">
+
+    <!-- Calendar Header -->
+    <div class="card glass mb-4">
+        <div class="card-body p-4">
+            <div class="flex items-center justify-between">
+                <button class="btn btn-ghost btn-sm" @click="prevMonth()">
+                    {% icon "chevron-back-outline" %}
+                </button>
+                <h2 class="text-lg font-semibold" x-text="monthYearLabel"></h2>
+                <button class="btn btn-ghost btn-sm" @click="nextMonth()">
+                    {% icon "chevron-forward-outline" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="card glass">
+        <div class="card-body p-0">
+            <!-- Day Headers -->
+            <div class="tasks-calendar-header">
+                <div class="tasks-calendar-day-name">{% trans "Mon" %}</div>
+                <div class="tasks-calendar-day-name">{% trans "Tue" %}</div>
+                <div class="tasks-calendar-day-name">{% trans "Wed" %}</div>
+                <div class="tasks-calendar-day-name">{% trans "Thu" %}</div>
+                <div class="tasks-calendar-day-name">{% trans "Fri" %}</div>
+                <div class="tasks-calendar-day-name">{% trans "Sat" %}</div>
+                <div class="tasks-calendar-day-name">{% trans "Sun" %}</div>
+            </div>
+
+            <!-- Calendar Days Grid -->
+            <div class="tasks-calendar-grid">
+                <template x-for="(day, index) in calendarDays" :key="index">
+                    <div class="tasks-calendar-cell"
+                         :class="{
+                             'tasks-calendar-cell-today': day.isToday,
+                             'tasks-calendar-cell-other': !day.isCurrentMonth,
+                             'tasks-calendar-cell-selected': selectedDate === day.dateStr
+                         }"
+                         @click="selectDate(day.dateStr)">
+                        <div class="tasks-calendar-cell-number" x-text="day.day"></div>
+                        <div class="tasks-calendar-cell-dots" x-show="getTasksForDate(day.dateStr).length > 0">
+                            <template x-for="task in getTasksForDate(day.dateStr).slice(0, 3)" :key="task.id">
+                                <span class="tasks-calendar-dot"
+                                      :class="'tasks-calendar-dot-' + task.priority_color"></span>
+                            </template>
+                            <span class="tasks-calendar-more"
+                                  x-show="getTasksForDate(day.dateStr).length > 3"
+                                  x-text="'+' + (getTasksForDate(day.dateStr).length - 3)"></span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selected Day Tasks -->
+    <div class="card glass mt-4" x-show="selectedDate" x-cloak>
+        <div class="card-header">
+            <h3 class="card-title">
+                {% icon "calendar-outline" css_class="text-primary" %}
+                <span x-text="selectedDateLabel"></span>
+            </h3>
+            <span class="badge color-primary" x-text="getTasksForDate(selectedDate).length"></span>
+        </div>
+        <div class="card-body p-0">
+            <template x-if="getTasksForDate(selectedDate).length > 0">
+                <div class="list">
+                    <template x-for="task in getTasksForDate(selectedDate)" :key="task.id">
+                        <div class="list-item list-item-clickable"
+                             @click="window.htmx.ajax('GET', '/m/tasks/' + task.id + '/', { target: '#task-day-detail', swap: 'innerHTML' })">
+                            <div class="list-item-start">
+                                <span class="w-2 h-2 rounded-full"
+                                      :class="'bg-' + task.priority_color"></span>
+                            </div>
+                            <div class="list-item-content">
+                                <div class="list-item-label">
+                                    <span x-text="task.title"
+                                          :class="{ 'line-through opacity-50': task.is_completed }"></span>
+                                </div>
+                                <div class="list-item-note">
+                                    <span x-text="task.due_time"></span>
+                                    <template x-if="task.customer_name">
+                                        <span> &middot; <span x-text="task.customer_name"></span></span>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="list-item-end">
+                                <span class="badge badge-sm"
+                                      :class="task.status_color ? 'color-' + task.status_color : ''"
+                                      x-text="task.type === 'task' ? '' : task.type"
+                                      x-show="task.type !== 'task'"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            <template x-if="getTasksForDate(selectedDate).length === 0">
+                <div class="p-6 text-center text-base-content/50">
+                    <p class="text-sm">{% trans "No tasks for this day" %}</p>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Task detail loaded here -->
+    <div id="task-day-detail"></div>
+
+</div>
+
+<script>
+function tasksCalendar(year, month, todayStr) {
+    return {
+        year: year,
+        month: month,
+        today: todayStr,
+        tasksByDate: {},
+        selectedDate: null,
+        calendarDays: [],
+        loading: false,
+
+        get monthYearLabel() {
+            const months = [
+                '{% trans "January" %}', '{% trans "February" %}', '{% trans "March" %}',
+                '{% trans "April" %}', '{% trans "May" %}', '{% trans "June" %}',
+                '{% trans "July" %}', '{% trans "August" %}', '{% trans "September" %}',
+                '{% trans "October" %}', '{% trans "November" %}', '{% trans "December" %}'
+            ];
+            return months[this.month - 1] + ' ' + this.year;
+        },
+
+        get selectedDateLabel() {
+            if (!this.selectedDate) return '';
+            const d = new Date(this.selectedDate + 'T00:00:00');
+            return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        },
+
+        buildCalendar() {
+            const days = [];
+            const firstDay = new Date(this.year, this.month - 1, 1);
+            const lastDay = new Date(this.year, this.month, 0);
+
+            // Monday = 0, Sunday = 6 (ISO week)
+            let startDow = firstDay.getDay();
+            startDow = startDow === 0 ? 6 : startDow - 1;
+
+            // Previous month days
+            const prevMonthLast = new Date(this.year, this.month - 1, 0);
+            for (let i = startDow - 1; i >= 0; i--) {
+                const day = prevMonthLast.getDate() - i;
+                const d = new Date(this.year, this.month - 2, day);
+                days.push({
+                    day: day,
+                    dateStr: this.formatDate(d),
+                    isCurrentMonth: false,
+                    isToday: this.formatDate(d) === this.today
+                });
+            }
+
+            // Current month days
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const d = new Date(this.year, this.month - 1, day);
+                days.push({
+                    day: day,
+                    dateStr: this.formatDate(d),
+                    isCurrentMonth: true,
+                    isToday: this.formatDate(d) === this.today
+                });
+            }
+
+            // Next month days to fill grid (6 rows max)
+            const remaining = 42 - days.length;
+            for (let day = 1; day <= remaining; day++) {
+                const d = new Date(this.year, this.month, day);
+                days.push({
+                    day: day,
+                    dateStr: this.formatDate(d),
+                    isCurrentMonth: false,
+                    isToday: this.formatDate(d) === this.today
+                });
+            }
+
+            this.calendarDays = days;
+        },
+
+        formatDate(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + day;
+        },
+
+        async fetchTasks() {
+            this.buildCalendar();
+            this.loading = true;
+            try {
+                const resp = await fetch('{% url "tasks:calendar_data" %}?year=' + this.year + '&month=' + this.month);
+                const data = await resp.json();
+                if (data.success) {
+                    this.tasksByDate = data.tasks;
+                }
+            } catch (e) {
+                console.error('Failed to load calendar data:', e);
+            }
+            this.loading = false;
+        },
+
+        getTasksForDate(dateStr) {
+            return this.tasksByDate[dateStr] || [];
+        },
+
+        selectDate(dateStr) {
+            this.selectedDate = this.selectedDate === dateStr ? null : dateStr;
+        },
+
+        prevMonth() {
+            if (this.month === 1) {
+                this.month = 12;
+                this.year--;
+            } else {
+                this.month--;
+            }
+            this.selectedDate = null;
+            this.fetchTasks();
+        },
+
+        nextMonth() {
+            if (this.month === 12) {
+                this.month = 1;
+                this.year++;
+            } else {
+                this.month++;
+            }
+            this.selectedDate = null;
+            this.fetchTasks();
+        }
+    };
+}
+</script>

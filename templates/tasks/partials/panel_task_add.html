@@ -1,0 +1,109 @@
+{% load djicons i18n %}
+
+<!-- Header -->
+<div class="side-sheet-header">
+    <h3 class="sheet-title">{% trans "Add Task" %}</h3>
+    <button class="sheet-close" @click="closePanel()">
+        {% icon "close-outline" %}
+    </button>
+</div>
+
+<!-- Body -->
+<div class="side-sheet-content">
+    <form id="add-task-form"
+          hx-post="{% url 'tasks:add' %}"
+          hx-target="#datatable-body"
+          hx-swap="innerHTML"
+          @htmx:after-request="closePanel()"
+          class="flex flex-col gap-4 p-6"
+          x-data="{ taskType: 'task' }">
+        {% csrf_token %}
+
+        <!-- Title -->
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Title" %} *</label>
+            <input type="text" name="title" class="input input-sm w-full"
+                   placeholder="{% trans 'Task title' %}" required autofocus>
+        </div>
+
+        <!-- Type & Priority -->
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="text-sm font-medium mb-1 block">{% trans "Type" %}</label>
+                <select name="task_type" class="select select-sm w-full" x-model="taskType">
+                    {% for value, label in type_choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="text-sm font-medium mb-1 block">{% trans "Priority" %}</label>
+                <select name="priority" class="select select-sm w-full">
+                    {% for value, label in priority_choices %}
+                    <option value="{{ value }}" {% if value == 'medium' %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Due Date -->
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Due Date" %}</label>
+            <input type="datetime-local" name="due_date" class="input input-sm w-full">
+        </div>
+
+        <!-- Customer -->
+        {% if customers %}
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Customer" %}</label>
+            <select name="customer" class="select select-sm w-full">
+                <option value="">{% trans "No customer" %}</option>
+                {% for customer in customers %}
+                <option value="{{ customer.id }}">{{ customer.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+        <!-- Description -->
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Description" %}</label>
+            <textarea name="description" class="textarea textarea-sm w-full" rows="2"
+                      placeholder="{% trans 'Description (optional)' %}"></textarea>
+        </div>
+
+        <!-- Duration (for calls/meetings) -->
+        <div x-show="taskType === 'call' || taskType === 'meeting'" x-cloak>
+            <label class="text-sm font-medium mb-1 block">{% trans "Duration (minutes)" %}</label>
+            <input type="number" name="duration_minutes" class="input input-sm w-full"
+                   min="0" placeholder="30">
+        </div>
+
+        <!-- Location (for meetings) -->
+        <div x-show="taskType === 'meeting'" x-cloak>
+            <label class="text-sm font-medium mb-1 block">{% trans "Location" %}</label>
+            <input type="text" name="location" class="input input-sm w-full"
+                   placeholder="{% trans 'Meeting location' %}">
+        </div>
+
+        <!-- Reminder -->
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Reminder (minutes before)" %}</label>
+            <input type="number" name="reminder_before_minutes" class="input input-sm w-full"
+                   min="0" value="30" placeholder="30">
+        </div>
+    </form>
+</div>
+
+<!-- Footer -->
+<div class="side-sheet-footer">
+    <div class="flex justify-end gap-2">
+        <button type="button" class="btn btn-ghost btn-sm" @click="closePanel()">
+            {% trans "Cancel" %}
+        </button>
+        <button type="submit" form="add-task-form" class="btn btn-sm color-primary">
+            {% icon "add-outline" %}
+            {% trans "Add Task" %}
+        </button>
+    </div>
+</div>

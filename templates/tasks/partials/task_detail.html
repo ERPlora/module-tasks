@@ -1,0 +1,177 @@
+{% load djicons i18n %}
+
+<!-- Header -->
+<div class="side-sheet-header">
+    <h3 class="sheet-title">{% trans "Task Details" %}</h3>
+    <button class="sheet-close" @click="closePanel()">
+        {% icon "close-outline" %}
+    </button>
+</div>
+
+<!-- Body -->
+<div class="side-sheet-content">
+    <div class="p-6">
+
+        <!-- Title & Status -->
+        <div class="mb-6">
+            <div class="flex items-start justify-between mb-2">
+                <h2 class="text-lg font-semibold{% if task.is_completed %} line-through opacity-60{% endif %}">
+                    {{ task.title }}
+                </h2>
+                <span class="badge{% if task.status_color %} color-{{ task.status_color }}{% endif %}">
+                    {{ task.get_status_display }}
+                </span>
+            </div>
+            {% if task.description %}
+            <p class="text-sm text-base-content/70 mt-2">{{ task.description }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Info Grid -->
+        <div class="flex flex-col gap-3">
+            <!-- Type -->
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon task.type_icon css_class="text-base" %}
+                    {% trans "Type" %}
+                </span>
+                <span class="font-medium">{{ task.get_task_type_display }}</span>
+            </div>
+
+            <!-- Priority -->
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "flag-outline" css_class="text-base" %}
+                    {% trans "Priority" %}
+                </span>
+                <span class="badge badge-sm color-{{ task.priority_color }}">{{ task.get_priority_display }}</span>
+            </div>
+
+            <!-- Due Date -->
+            {% if task.due_date %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "calendar-outline" css_class="text-base" %}
+                    {% trans "Due Date" %}
+                </span>
+                <span class="{% if task.is_overdue %}text-error font-medium{% elif task.is_due_today %}text-warning font-medium{% endif %}">
+                    {{ task.due_date|date:"M d, Y H:i" }}
+                    {% if task.is_overdue %}
+                    <span class="badge badge-sm color-error ml-1">{% trans "Overdue" %}</span>
+                    {% elif task.is_due_today %}
+                    <span class="badge badge-sm color-warning ml-1">{% trans "Today" %}</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+
+            <!-- Customer -->
+            {% if task.customer %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "person-outline" css_class="text-base" %}
+                    {% trans "Customer" %}
+                </span>
+                <span class="font-medium">{{ task.customer.name }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Duration -->
+            {% if task.duration_minutes %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "time-outline" css_class="text-base" %}
+                    {% trans "Duration" %}
+                </span>
+                <span>{{ task.duration_minutes }} {% trans "min" %}</span>
+            </div>
+            {% endif %}
+
+            <!-- Location -->
+            {% if task.location %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "location-outline" css_class="text-base" %}
+                    {% trans "Location" %}
+                </span>
+                <span>{{ task.location }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Reminder -->
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "notifications-outline" css_class="text-base" %}
+                    {% trans "Reminder" %}
+                </span>
+                <span>{{ task.reminder_before_minutes }} {% trans "min before" %}</span>
+            </div>
+
+            <!-- Completed At -->
+            {% if task.completed_at %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "checkmark-circle-outline" css_class="text-base text-success" %}
+                    {% trans "Completed" %}
+                </span>
+                <span class="text-success">{{ task.completed_at|date:"M d, Y H:i" }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Created -->
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-base-content/60 flex items-center gap-2">
+                    {% icon "create-outline" css_class="text-base" %}
+                    {% trans "Created" %}
+                </span>
+                <span>{{ task.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+        </div>
+
+        <!-- Result -->
+        {% if task.result %}
+        <div class="mt-6 border-t border-base-300 pt-4">
+            <h4 class="font-semibold text-sm mb-2">{% trans "Result / Outcome" %}</h4>
+            <p class="text-sm text-base-content/70">{{ task.result }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="side-sheet-footer">
+    <div class="flex justify-between gap-2">
+        <div>
+            {% if not task.is_completed %}
+            <button class="btn btn-sm color-success"
+                    hx-post="{% url 'tasks:complete' task_id=task.id %}"
+                    hx-target="#datatable-body"
+                    hx-swap="innerHTML"
+                    @click="closePanel()">
+                {% icon "checkmark-circle-outline" %}
+                {% trans "Complete" %}
+            </button>
+            {% else %}
+            <button class="btn btn-sm btn-outline"
+                    hx-post="{% url 'tasks:reopen' task_id=task.id %}"
+                    hx-target="#datatable-body"
+                    hx-swap="innerHTML"
+                    @click="closePanel()">
+                {% icon "refresh-outline" %}
+                {% trans "Reopen" %}
+            </button>
+            {% endif %}
+        </div>
+        <div class="flex gap-2">
+            <button type="button" class="btn btn-ghost btn-sm" @click="closePanel()">
+                {% trans "Close" %}
+            </button>
+            <button class="btn btn-sm color-primary"
+                    @click="openPanel('{% url 'tasks:edit' task_id=task.id %}')">
+                {% icon "create-outline" %}
+                {% trans "Edit" %}
+            </button>
+        </div>
+    </div>
+</div>
