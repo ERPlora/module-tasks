@@ -1,6 +1,7 @@
 {% load djicons i18n %}
 
 <div x-data="{
+    view: '{{ current_view|default:'table' }}',
     panelOpen: false,
     selectedIds: [],
     selectAll: false,
@@ -24,14 +25,11 @@
         htmx.ajax('GET', url, { target: '#task-panel-content', swap: 'innerHTML' });
         this.panelOpen = true;
     },
-    closePanel() {
-        this.panelOpen = false;
-    },
+    closePanel() { this.panelOpen = false; },
     confirmDelete() {
         if (this.deleteTarget) {
             htmx.ajax('POST', this.deleteTarget.url, {
-                target: '#datatable-body',
-                swap: 'innerHTML',
+                target: '#datatable-body', swap: 'innerHTML',
                 headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}' }
             });
         }
@@ -41,105 +39,72 @@
 }">
 
     <div class="datatable glass mt-5" id="tasks-datatable">
-
-        <!-- Toolbar -->
         <div class="datatable-toolbar">
             <div class="datatable-toolbar-start">
                 <label class="input input-sm datatable-search">
                     {% icon "search-outline" %}
-                    <input type="search"
-                           name="q"
-                           placeholder="{% trans 'Search tasks...' %}"
+                    <input type="search" name="q"
+                           placeholder="{% trans 'Search...' %}"
                            value="{{ search_query|default:'' }}"
                            autocomplete="off"
-                           hx-get="{% url 'tasks:list' %}"
+                           hx-get="{% url 'tasks:tasks_list' %}"
                            hx-target="#datatable-body"
                            hx-include="#tasks-datatable"
                            hx-trigger="input changed delay:300ms, search">
                 </label>
-                <select name="type"
-                        class="select select-sm"
-                        hx-get="{% url 'tasks:list' %}"
-                        hx-target="#datatable-body"
-                        hx-include="#tasks-datatable"
-                        hx-trigger="change">
-                    <option value="">{% trans "All Types" %}</option>
-                    {% for value, label in type_choices %}
-                    <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <select name="status"
-                        class="select select-sm"
-                        hx-get="{% url 'tasks:list' %}"
-                        hx-target="#datatable-body"
-                        hx-include="#tasks-datatable"
-                        hx-trigger="change">
-                    <option value="">{% trans "All Status" %}</option>
-                    {% for value, label in status_choices %}
-                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <select name="priority"
-                        class="select select-sm"
-                        hx-get="{% url 'tasks:list' %}"
-                        hx-target="#datatable-body"
-                        hx-include="#tasks-datatable"
-                        hx-trigger="change">
-                    <option value="">{% trans "All Priorities" %}</option>
-                    {% for value, label in priority_choices %}
-                    <option value="{{ value }}" {% if priority_filter == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
             </div>
             <div class="datatable-toolbar-end">
-                <!-- Add Task -->
                 <button class="btn btn-sm btn-circle color-primary"
-                        @click="openPanel('{% url 'tasks:add' %}')"
-                        title="{% trans 'Add Task' %}">
+                        @click="openPanel('{% url 'tasks:task_add' %}')"
+                        title="{% trans 'Add' %}">
                     {% icon "add-outline" %}
                 </button>
+                <details class="dropdown" x-data="{ open: false }" :open="open" @click.outside="open = false">
+                    <summary class="datatable-export-btn" @click.prevent="open = !open" title="{% trans 'Export' %}">
+                        {% icon "download-outline" %}
+                    </summary>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#"
+                           @click.prevent="open = false; window.location.href = '{% url 'tasks:tasks_list' %}?export=csv&' + new URLSearchParams({q: document.querySelector('[name=q]')?.value || ''}).toString()">
+                            {% icon "document-text-outline" %} {% trans "Export as CSV" %}
+                        </a>
+                        <a class="dropdown-item" href="#"
+                           @click.prevent="open = false; window.location.href = '{% url 'tasks:tasks_list' %}?export=excel&' + new URLSearchParams({q: document.querySelector('[name=q]')?.value || ''}).toString()">
+                            {% icon "document-text-outline" %} {% trans "Export as Excel" %}
+                        </a>
+                    </div>
+                </details>
             </div>
         </div>
 
-        <!-- Bulk Actions Bar -->
+        <!-- Bulk Actions -->
         <div class="datatable-bulk" x-show="selectedIds.length > 0" x-cloak>
             <div class="datatable-bulk-info">
                 <span class="datatable-bulk-count" x-text="selectedIds.length"></span>
                 <span>{% trans "selected" %}</span>
             </div>
             <div class="datatable-bulk-actions">
-                <button class="datatable-bulk-btn"
-                        hx-post="{% url 'tasks:bulk_action' %}"
-                        hx-target="#datatable-body"
-                        hx-include="#tasks-datatable"
-                        :hx-vals="JSON.stringify({ids: selectedIds.join(','), action: 'complete'})"
-                        @htmx:after-request="clearSelection()">
-                    {% icon "checkmark-circle-outline" %}
-                    {% trans "Complete" %}
-                </button>
+                
+                
                 <button class="datatable-bulk-btn datatable-bulk-btn-danger"
-                        hx-post="{% url 'tasks:bulk_action' %}"
-                        hx-target="#datatable-body"
-                        hx-include="#tasks-datatable"
+                        hx-post="{% url 'tasks:tasks_bulk_action' %}"
+                        hx-target="#datatable-body" hx-include="#tasks-datatable"
                         :hx-vals="JSON.stringify({ids: selectedIds.join(','), action: 'delete'})"
                         @htmx:after-request="clearSelection()">
-                    {% icon "trash-outline" %}
-                    {% trans "Delete" %}
+                    {% icon "trash-outline" %} {% trans "Delete" %}
                 </button>
-                <button class="datatable-bulk-clear" @click="clearSelection()" title="{% trans 'Clear selection' %}">
+                <button class="datatable-bulk-clear" @click="clearSelection()">
                     {% icon "close-outline" %}
                 </button>
             </div>
         </div>
 
         {% csrf_token %}
-
-        <!-- Hidden state inputs -->
-        <input type="hidden" name="sort" value="{{ sort_field|default:'due_date' }}">
-        <input type="hidden" name="dir" value="{{ sort_dir|default:'desc' }}">
+        <input type="hidden" name="sort" value="{{ sort_field|default:'name' }}">
+        <input type="hidden" name="dir" value="{{ sort_dir|default:'asc' }}">
+        <input type="hidden" name="view" :value="view">
         <input type="hidden" name="per_page" value="{{ per_page|default:'10' }}">
 
-        <!-- Datatable Body (HTMX swap target) -->
         <div id="datatable-body">
             {% include "tasks/partials/tasks_list.html" %}
         </div>
@@ -147,36 +112,25 @@
 
     <!-- Side Sheet -->
     <div class="sheet-backdrop" :class="{ 'is-open': panelOpen }" @click.self="closePanel()">
-        <div class="side-sheet side-sheet-right" id="task-panel-content">
-            <!-- Content loaded via HTMX -->
-        </div>
+        <div class="side-sheet side-sheet-right" id="task-panel-content"></div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Delete Modal -->
     <div class="modal-backdrop" :data-state="deleteConfirm ? 'open' : 'closed'" @click.self="deleteConfirm = false; deleteTarget = null">
         <div class="modal modal-sm">
             <div class="modal-header">
-                <h3 class="modal-title">{% trans "Delete Task" %}</h3>
-                <button class="modal-close" @click="deleteConfirm = false; deleteTarget = null">
-                    {% icon "close-outline" %}
-                </button>
+                <h3 class="modal-title">{% trans "Confirm Delete" %}</h3>
+                <button class="modal-close" @click="deleteConfirm = false; deleteTarget = null">{% icon "close-outline" %}</button>
             </div>
             <div class="modal-body">
                 <p class="text-sm text-base-content/70">
                     {% trans "Are you sure you want to delete" %} <strong x-text="deleteTarget?.name"></strong>?
-                    {% trans "This action cannot be undone." %}
                 </p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-ghost btn-sm" @click="deleteConfirm = false; deleteTarget = null">
-                    {% trans "Cancel" %}
-                </button>
-                <button class="btn btn-sm color-error" @click="confirmDelete()">
-                    {% icon "trash-outline" %}
-                    {% trans "Delete" %}
-                </button>
+                <button class="btn btn-ghost btn-sm" @click="deleteConfirm = false; deleteTarget = null">{% trans "Cancel" %}</button>
+                <button class="btn btn-sm color-error" @click="confirmDelete()">{% icon "trash-outline" %} {% trans "Delete" %}</button>
             </div>
         </div>
     </div>
-
 </div>

@@ -1,215 +1,49 @@
 {% load djicons i18n %}
 
 <div class="p-4">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold">{% trans "Tasks" %}</h1>
+        <p class="text-sm mt-1 opacity-60">{% trans "Task management, calls, meetings and activities" %}</p>
+    </div>
 
-    <!-- Stat Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <!-- Due Today -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="card">
-            <div class="card-body p-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-warning/10 rounded-xl flex items-center justify-center">
-                        {% icon "today-outline" css_class="text-xl text-warning" %}
-                    </div>
-                    <div>
-                        <div class="text-xs text-base-content/60">{% trans "Due Today" %}</div>
-                        <div class="text-xl font-semibold">{{ due_today }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Overdue -->
-        <div class="card">
-            <div class="card-body p-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-error/10 rounded-xl flex items-center justify-center">
-                        {% icon "alert-circle-outline" css_class="text-xl text-error" %}
-                    </div>
-                    <div>
-                        <div class="text-xs text-base-content/60">{% trans "Overdue" %}</div>
-                        <div class="text-xl font-semibold {% if overdue %}text-error{% endif %}">{{ overdue }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Completed This Week -->
-        <div class="card">
-            <div class="card-body p-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center">
-                        {% icon "checkmark-circle-outline" css_class="text-xl text-success" %}
-                    </div>
-                    <div>
-                        <div class="text-xs text-base-content/60">{% trans "Completed" %}</div>
-                        <div class="text-xl font-semibold text-success">{{ completed_this_week }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Calls Today -->
-        <div class="card">
-            <div class="card-body p-4">
+            <div class="card-body">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                        {% icon "call-outline" css_class="text-xl text-primary" %}
+                        {% icon "cube-outline" css_class="text-xl text-primary" %}
                     </div>
                     <div>
-                        <div class="text-xs text-base-content/60">{% trans "Calls" %}</div>
-                        <div class="text-xl font-semibold">{{ calls_today }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Meetings Today -->
-        <div class="card">
-            <div class="card-body p-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                        {% icon "people-outline" css_class="text-xl text-primary" %}
-                    </div>
-                    <div>
-                        <div class="text-xs text-base-content/60">{% trans "Meetings" %}</div>
-                        <div class="text-xl font-semibold">{{ meetings_today }}</div>
+                        <div class="text-xs opacity-60">{% trans "Total Tasks" %}</div>
+                        <div class="text-xl font-semibold">{{ total_tasks }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        <!-- Overdue Tasks -->
-        {% if overdue_tasks %}
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    {% icon "alert-circle-outline" css_class="text-error" %}
-                    {% trans "Overdue Tasks" %}
-                </h3>
-                <span class="badge color-error">{{ overdue }}</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="list">
-                    {% for task in overdue_tasks %}
-                    <a class="list-item list-item-clickable"
-                       hx-get="{% url 'tasks:list' %}?status=pending&status=in_progress"
-                       hx-target="#main-content-area"
-                       hx-push-url="true">
-                        <div class="list-item-start">
-                            {% icon task.type_icon css_class="text-xl text-error" %}
-                        </div>
-                        <div class="list-item-content">
-                            <div class="list-item-label">{{ task.title }}</div>
-                            <div class="list-item-note">
-                                {% if task.customer_name %}{{ task.customer_name }} &middot; {% endif %}
-                                {% if task.due_date %}
-                                <span class="text-error">{{ task.due_date|date:"M d, H:i" }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="list-item-end">
-                            <span class="badge badge-sm color-{{ task.priority_color }}">{{ task.get_priority_display }}</span>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{% trans "Quick Actions" %}</h3>
         </div>
-        {% endif %}
-
-        <!-- Upcoming Tasks -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    {% icon "calendar-outline" css_class="text-primary" %}
-                    {% trans "Upcoming (Next 7 Days)" %}
-                </h3>
-                <a class="btn btn-sm btn-ghost"
-                   hx-get="{% url 'tasks:list' %}"
-                   hx-target="#main-content-area"
-                   hx-push-url="true">
-                    {% trans "View All" %}
-                </a>
-            </div>
-            <div class="card-body p-0">
-                {% if upcoming_tasks %}
-                <div class="list">
-                    {% for task in upcoming_tasks %}
-                    <div class="list-item">
-                        <div class="list-item-start">
-                            {% icon task.type_icon css_class="text-xl" %}
-                        </div>
-                        <div class="list-item-content">
-                            <div class="list-item-label">{{ task.title }}</div>
-                            <div class="list-item-note">
-                                {% if task.customer_name %}{{ task.customer_name }} &middot; {% endif %}
-                                {% if task.due_date %}
-                                <span class="{% if task.is_due_today %}text-warning{% endif %}">
-                                    {{ task.due_date|date:"M d, H:i" }}
-                                </span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="list-item-end">
-                            <span class="badge badge-sm color-{{ task.priority_color }}">{{ task.get_priority_display }}</span>
-                        </div>
+        <div class="list list-inset">
+            <a class="list-item list-item-clickable"
+               hx-get="{% url 'tasks:tasks_list' %}"
+               hx-target="#main-content-area"
+               hx-push-url="true">
+                <div class="list-item-start">
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        {% icon "list-outline" css_class="text-xl text-primary" %}
                     </div>
-                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="p-6 text-center text-base-content/50">
-                    {% icon "calendar-outline" css_class="text-3xl mb-2" %}
-                    <p class="text-sm">{% trans "No upcoming tasks in the next 7 days" %}</p>
+                <div class="list-item-content">
+                    <div class="list-item-label">{% trans "Manage Tasks" %}</div>
+                    <div class="list-item-note">{% trans "View and manage all tasks" %}</div>
                 </div>
-                {% endif %}
-            </div>
+                <div class="list-item-end">
+                    <span class="list-item-chevron">{% icon "chevron-forward-outline" %}</span>
+                </div>
+            </a>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="card {% if not overdue_tasks %}lg:col-span-2{% endif %}">
-            <div class="card-header">
-                <h3 class="card-title">{% icon "flash-outline" css_class="text-primary" %} {% trans "Quick Actions" %}</h3>
-            </div>
-            <div class="card-body p-0">
-                <div class="list">
-                    <a hx-get="{% url 'tasks:list' %}"
-                       hx-target="#main-content-area"
-                       hx-push-url="true"
-                       class="list-item list-item-clickable">
-                        <div class="list-item-start">
-                            {% icon "checkbox-outline" css_class="text-xl text-primary" %}
-                        </div>
-                        <div class="list-item-content">
-                            <div class="list-item-label">{% trans "View All Tasks" %}</div>
-                            <div class="list-item-note">{% trans "Browse and manage all tasks, calls and meetings" %}</div>
-                        </div>
-                        <div class="list-item-end">
-                            <span class="list-item-chevron"></span>
-                        </div>
-                    </a>
-                    <a hx-get="{% url 'tasks:calendar' %}"
-                       hx-target="#main-content-area"
-                       hx-push-url="true"
-                       class="list-item list-item-clickable">
-                        <div class="list-item-start">
-                            {% icon "calendar-outline" css_class="text-xl text-success" %}
-                        </div>
-                        <div class="list-item-content">
-                            <div class="list-item-label">{% trans "Calendar View" %}</div>
-                            <div class="list-item-note">{% trans "See tasks on a monthly calendar" %}</div>
-                        </div>
-                        <div class="list-item-end">
-                            <span class="list-item-chevron"></span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-
     </div>
-
 </div>

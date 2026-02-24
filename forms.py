@@ -1,115 +1,39 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import Task, TaskSettings, TYPE_CHOICES, PRIORITY_CHOICES, STATUS_CHOICES
-
+from .models import Task, TaskSettings
 
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = [
-            'title', 'description', 'task_type', 'priority', 'status',
-            'due_date', 'assigned_to', 'customer', 'duration_minutes',
-            'result', 'location', 'reminder_before_minutes',
-        ]
+        fields = ['title', 'description', 'task_type', 'priority', 'status', 'due_date', 'completed_at', 'assigned_to', 'customer', 'related_lead', 'duration_minutes', 'result', 'location', 'is_recurring', 'recurrence_rule', 'reminder_before_minutes']
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'input',
-                'placeholder': _('Task title'),
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'textarea',
-                'rows': 3,
-                'placeholder': _('Description (optional)'),
-            }),
-            'task_type': forms.Select(attrs={
-                'class': 'select',
-            }),
-            'priority': forms.Select(attrs={
-                'class': 'select',
-            }),
-            'status': forms.Select(attrs={
-                'class': 'select',
-            }),
-            'due_date': forms.DateTimeInput(attrs={
-                'class': 'input',
-                'type': 'datetime-local',
-            }),
-            'duration_minutes': forms.NumberInput(attrs={
-                'class': 'input',
-                'min': '0',
-                'placeholder': _('Duration in minutes'),
-            }),
-            'result': forms.Textarea(attrs={
-                'class': 'textarea',
-                'rows': 2,
-                'placeholder': _('Call/meeting outcome'),
-            }),
-            'location': forms.TextInput(attrs={
-                'class': 'input',
-                'placeholder': _('Meeting location'),
-            }),
-            'reminder_before_minutes': forms.NumberInput(attrs={
-                'class': 'input',
-                'min': '0',
-                'placeholder': '30',
-            }),
+            'title': forms.TextInput(attrs={'class': 'input input-sm w-full'}),
+            'description': forms.Textarea(attrs={'class': 'textarea textarea-sm w-full', 'rows': 3}),
+            'task_type': forms.Select(attrs={'class': 'select select-sm w-full'}),
+            'priority': forms.Select(attrs={'class': 'select select-sm w-full'}),
+            'status': forms.Select(attrs={'class': 'select select-sm w-full'}),
+            'due_date': forms.TextInput(attrs={'class': 'input input-sm w-full', 'type': 'datetime-local'}),
+            'completed_at': forms.TextInput(attrs={'class': 'input input-sm w-full', 'type': 'datetime-local'}),
+            'assigned_to': forms.TextInput(attrs={'class': 'input input-sm w-full'}),
+            'customer': forms.Select(attrs={'class': 'select select-sm w-full'}),
+            'related_lead': forms.TextInput(attrs={'class': 'input input-sm w-full'}),
+            'duration_minutes': forms.TextInput(attrs={'class': 'input input-sm w-full', 'type': 'number'}),
+            'result': forms.Textarea(attrs={'class': 'textarea textarea-sm w-full', 'rows': 3}),
+            'location': forms.TextInput(attrs={'class': 'input input-sm w-full'}),
+            'is_recurring': forms.CheckboxInput(attrs={'class': 'toggle'}),
+            'recurrence_rule': forms.Textarea(attrs={'class': 'textarea textarea-sm w-full', 'rows': 3}),
+            'reminder_before_minutes': forms.TextInput(attrs={'class': 'input input-sm w-full', 'type': 'number'}),
         }
-
-
-class TaskFilterForm(forms.Form):
-    q = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'input',
-            'placeholder': _('Search by title, customer...'),
-        }),
-    )
-    task_type = forms.ChoiceField(
-        required=False,
-        choices=[('', _('All Types'))] + list(TYPE_CHOICES),
-        widget=forms.Select(attrs={
-            'class': 'select',
-        }),
-    )
-    status = forms.ChoiceField(
-        required=False,
-        choices=[('', _('All Status'))] + list(STATUS_CHOICES),
-        widget=forms.Select(attrs={
-            'class': 'select',
-        }),
-    )
-    priority = forms.ChoiceField(
-        required=False,
-        choices=[('', _('All Priorities'))] + list(PRIORITY_CHOICES),
-        widget=forms.Select(attrs={
-            'class': 'select',
-        }),
-    )
-
 
 class TaskSettingsForm(forms.ModelForm):
     class Meta:
         model = TaskSettings
-        fields = [
-            'default_reminder_minutes', 'auto_create_follow_up',
-            'working_hours_start', 'working_hours_end',
-        ]
+        fields = ['default_reminder_minutes', 'auto_create_follow_up', 'working_hours_start', 'working_hours_end']
         widgets = {
-            'default_reminder_minutes': forms.NumberInput(attrs={
-                'class': 'input',
-                'min': '0',
-                'placeholder': '30',
-            }),
-            'auto_create_follow_up': forms.CheckboxInput(attrs={
-                'class': 'toggle',
-            }),
-            'working_hours_start': forms.TimeInput(attrs={
-                'class': 'input',
-                'type': 'time',
-            }),
-            'working_hours_end': forms.TimeInput(attrs={
-                'class': 'input',
-                'type': 'time',
-            }),
+            'default_reminder_minutes': forms.TextInput(attrs={'class': 'input input-sm w-full', 'type': 'number'}),
+            'auto_create_follow_up': forms.CheckboxInput(attrs={'class': 'toggle'}),
+            'working_hours_start': forms.TextInput(attrs={'class': 'input input-sm w-full', 'type': 'time'}),
+            'working_hours_end': forms.TextInput(attrs={'class': 'input input-sm w-full', 'type': 'time'}),
         }
+

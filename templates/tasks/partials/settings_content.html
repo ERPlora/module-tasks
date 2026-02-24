@@ -1,207 +1,48 @@
 {% load djicons i18n %}
 
 <div class="p-4">
-
-    <!-- Overview Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="card">
-            <div class="card-body p-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                        {% icon "checkbox-outline" css_class="text-2xl text-primary" %}
-                    </div>
-                    <div>
-                        <div class="text-sm text-base-content/60">{% trans "Total Tasks" %}</div>
-                        <div class="text-2xl font-semibold">{{ total_tasks }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body p-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
-                        {% icon "checkmark-circle-outline" css_class="text-2xl text-success" %}
-                    </div>
-                    <div>
-                        <div class="text-sm text-base-content/60">{% trans "Completed" %}</div>
-                        <div class="text-2xl font-semibold text-success">{{ total_completed }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body p-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
-                        {% icon "hourglass-outline" css_class="text-2xl text-warning" %}
-                    </div>
-                    <div>
-                        <div class="text-sm text-base-content/60">{% trans "Pending" %}</div>
-                        <div class="text-2xl font-semibold">{{ total_pending }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold">{% trans "Settings" %}</h1>
+        <p class="text-sm mt-1 opacity-60">{% trans "Module configuration" %}</p>
     </div>
 
-    <!-- Settings Form -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">{% icon "settings-outline" css_class="text-primary" %} {% trans "Task Settings" %}</h3>
-        </div>
-        <div class="card-body">
-            <form hx-post="{% url 'tasks:settings' %}"
-                  hx-target="#main-content-area"
-                  hx-swap="innerHTML"
-                  class="flex flex-col gap-6">
-                {% csrf_token %}
-
-                <!-- Default Reminder -->
-                <div class="form-group">
-                    <label class="form-group-label">{% trans "Default Reminder (minutes)" %}</label>
-                    <input type="number" name="default_reminder_minutes"
-                           class="input w-full max-w-xs"
-                           min="0"
-                           value="{{ settings.default_reminder_minutes }}"
-                           placeholder="30">
-                    <p class="text-xs text-base-content/50 mt-1">
-                        {% trans "Default reminder time before task due date. Set to 0 to disable." %}
-                    </p>
-                </div>
-
-                <!-- Working Hours -->
-                <div>
-                    <label class="form-group-label mb-2 block">{% trans "Working Hours" %}</label>
-                    <div class="grid grid-cols-2 gap-4 max-w-xs">
-                        <div>
-                            <label class="text-xs text-base-content/60 mb-1 block">{% trans "Start" %}</label>
-                            <input type="time" name="working_hours_start"
-                                   class="input w-full"
-                                   value="{{ settings.working_hours_start|time:'H:i' }}">
-                        </div>
-                        <div>
-                            <label class="text-xs text-base-content/60 mb-1 block">{% trans "End" %}</label>
-                            <input type="time" name="working_hours_end"
-                                   class="input w-full"
-                                   value="{{ settings.working_hours_end|time:'H:i' }}">
-                        </div>
+    <form hx-post="{% url 'tasks:settings' %}" hx-swap="none">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-body divide-y divide-base-300">
+                <div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div class="flex-1 pr-4">
+                        <h3 class="font-semibold text-sm">{% trans "Default Reminder Minutes" %}</h3>
                     </div>
+                    <input type="number" name="default_reminder_minutes" class="input input-sm w-48" value="{{ config.default_reminder_minutes }}">
                 </div>
-
-                <!-- Auto Follow-up -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <label class="form-group-label">{% trans "Auto-create Follow-up" %}</label>
-                        <p class="text-xs text-base-content/50 mt-1">
-                            {% trans "Automatically create a follow-up task when completing a call or meeting." %}
-                        </p>
+                <div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div class="flex-1 pr-4">
+                        <h3 class="font-semibold text-sm">{% trans "Auto Create Follow Up" %}</h3>
                     </div>
                     <label class="toggle color-success">
-                        <input type="checkbox" name="auto_create_follow_up"
-                               {% if settings.auto_create_follow_up %}checked{% endif %}>
+                        <input type="checkbox" name="auto_create_follow_up" {% if config.auto_create_follow_up %}checked{% endif %}>
                         <span class="toggle-track"><span class="toggle-thumb"></span></span>
                     </label>
                 </div>
-
-                <!-- Save Button -->
-                <div class="flex justify-end">
-                    <button type="submit" class="btn color-primary">
-                        {% icon "checkmark-outline" %}
-                        {% trans "Save Settings" %}
-                    </button>
+                <div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div class="flex-1 pr-4">
+                        <h3 class="font-semibold text-sm">{% trans "Working Hours Start" %}</h3>
+                    </div>
+                    <input type="time" name="working_hours_start" class="input input-sm w-48" value="{{ config.working_hours_start }}">
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">{% icon "flash-outline" css_class="text-primary" %} {% trans "Quick Actions" %}</h3>
-        </div>
-        <div class="card-body p-0">
-            <div class="list">
-                <a hx-get="{% url 'tasks:list' %}"
-                   hx-target="#main-content-area"
-                   hx-push-url="true"
-                   class="list-item list-item-clickable">
-                    <div class="list-item-start">
-                        {% icon "checkbox-outline" css_class="text-xl text-primary" %}
+                <div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div class="flex-1 pr-4">
+                        <h3 class="font-semibold text-sm">{% trans "Working Hours End" %}</h3>
                     </div>
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "View All Tasks" %}</div>
-                        <div class="list-item-note">{% trans "Browse and manage all tasks" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        <span class="list-item-chevron"></span>
-                    </div>
-                </a>
-                <a hx-get="{% url 'tasks:calendar' %}"
-                   hx-target="#main-content-area"
-                   hx-push-url="true"
-                   class="list-item list-item-clickable">
-                    <div class="list-item-start">
-                        {% icon "calendar-outline" css_class="text-xl text-success" %}
-                    </div>
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "Calendar View" %}</div>
-                        <div class="list-item-note">{% trans "See tasks on a monthly calendar" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        <span class="list-item-chevron"></span>
-                    </div>
-                </a>
-                <a hx-get="{% url 'tasks:dashboard' %}"
-                   hx-target="#main-content-area"
-                   hx-push-url="true"
-                   class="list-item list-item-clickable">
-                    <div class="list-item-start">
-                        {% icon "speedometer-outline" css_class="text-xl text-warning" %}
-                    </div>
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "Dashboard" %}</div>
-                        <div class="list-item-note">{% trans "View task statistics and overview" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        <span class="list-item-chevron"></span>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Data Management -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">{% icon "server-outline" css_class="text-warning" %} {% trans "Data Management" %}</h3>
-        </div>
-        <div class="card-body p-0">
-            <div class="list">
-                <div class="list-item">
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "Task Records" %}</div>
-                        <div class="list-item-note">{% trans "Total tasks in the database" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        <span class="badge color-primary">{{ total_tasks }}</span>
-                    </div>
-                </div>
-                <div class="list-item">
-                    <div class="list-item-content">
-                        <div class="list-item-label">{% trans "Completion Rate" %}</div>
-                        <div class="list-item-note">{% trans "Percentage of completed tasks" %}</div>
-                    </div>
-                    <div class="list-item-end">
-                        {% if total_tasks %}
-                        <span class="badge color-success">{% widthratio total_completed total_tasks 100 %}%</span>
-                        {% else %}
-                        <span class="badge">0%</span>
-                        {% endif %}
-                    </div>
+                    <input type="time" name="working_hours_end" class="input input-sm w-48" value="{{ config.working_hours_end }}">
                 </div>
             </div>
         </div>
-    </div>
-
+        <div class="flex justify-end mt-4">
+            <button type="submit" class="btn color-primary">
+                {% icon "checkmark-outline" %} {% trans "Save Settings" %}
+            </button>
+        </div>
+    </form>
 </div>
