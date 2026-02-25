@@ -1,0 +1,379 @@
+# English translations for Tasks
+# Copyright (C) 2025
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-25 00:00+0000\n"
+"PO-Revision-Date: 2026-02-25 00:00+0000\n"
+"Last-Translator: ERPlora Team <info@erplora.com>\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: module.py
+msgid "Tasks"
+msgstr "Tasks"
+
+msgid "Task management, calls, meetings and activities"
+msgstr "Task management, calls, meetings and activities"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Calendar"
+msgstr "Calendar"
+
+msgid "Settings"
+msgstr "Settings"
+
+#: models.py - TYPE_CHOICES
+msgid "Task"
+msgstr "Task"
+
+msgid "Call"
+msgstr "Call"
+
+msgid "Meeting"
+msgstr "Meeting"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Follow-up"
+msgstr "Follow-up"
+
+#: models.py - PRIORITY_CHOICES
+msgid "Low"
+msgstr "Low"
+
+msgid "Medium"
+msgstr "Medium"
+
+msgid "High"
+msgstr "High"
+
+msgid "Urgent"
+msgstr "Urgent"
+
+#: models.py - STATUS_CHOICES
+msgid "Pending"
+msgstr "Pending"
+
+msgid "In Progress"
+msgstr "In Progress"
+
+msgid "Completed"
+msgstr "Completed"
+
+msgid "Cancelled"
+msgstr "Cancelled"
+
+#: models.py - Task
+msgid "Title"
+msgstr "Title"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Priority"
+msgstr "Priority"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Due Date"
+msgstr "Due Date"
+
+msgid "Completed At"
+msgstr "Completed At"
+
+msgid "Assigned To"
+msgstr "Assigned To"
+
+msgid "UUID of the user assigned to this task"
+msgstr "UUID of the user assigned to this task"
+
+msgid "Customer"
+msgstr "Customer"
+
+msgid "Related Lead"
+msgstr "Related Lead"
+
+msgid "UUID of a related lead or entity"
+msgstr "UUID of a related lead or entity"
+
+msgid "Duration (minutes)"
+msgstr "Duration (minutes)"
+
+msgid "Duration for calls and meetings"
+msgstr "Duration for calls and meetings"
+
+msgid "Result"
+msgstr "Result"
+
+msgid "Outcome of call or meeting"
+msgstr "Outcome of call or meeting"
+
+msgid "Location"
+msgstr "Location"
+
+msgid "Location for meetings"
+msgstr "Location for meetings"
+
+msgid "Recurring"
+msgstr "Recurring"
+
+msgid "Recurrence Rule"
+msgstr "Recurrence Rule"
+
+msgid "JSON recurrence configuration"
+msgstr "JSON recurrence configuration"
+
+msgid "Reminder Before (minutes)"
+msgstr "Reminder Before (minutes)"
+
+#: models.py - TaskSettings
+msgid "Default Reminder (minutes)"
+msgstr "Default Reminder (minutes)"
+
+msgid "Default reminder time before task due date"
+msgstr "Default reminder time before task due date"
+
+msgid "Auto-create Follow-up"
+msgstr "Auto-create Follow-up"
+
+msgid "Automatically create a follow-up task after completing a call or meeting"
+msgstr "Automatically create a follow-up task after completing a call or meeting"
+
+msgid "Working Hours Start"
+msgstr "Working Hours Start"
+
+msgid "Working Hours End"
+msgstr "Working Hours End"
+
+msgid "Task Settings"
+msgstr "Task Settings"
+
+#: templates - dashboard
+msgid "Total Tasks"
+msgstr "Total Tasks"
+
+msgid "Quick Actions"
+msgstr "Quick Actions"
+
+msgid "Manage Tasks"
+msgstr "Manage Tasks"
+
+msgid "View and manage all tasks"
+msgstr "View and manage all tasks"
+
+#: templates - tasks list
+msgid "Search..."
+msgstr "Search..."
+
+msgid "Add"
+msgstr "Add"
+
+msgid "Export"
+msgstr "Export"
+
+msgid "Export as CSV"
+msgstr "Export as CSV"
+
+msgid "Export as Excel"
+msgstr "Export as Excel"
+
+msgid "selected"
+msgstr "selected"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Confirm Delete"
+msgstr "Confirm Delete"
+
+msgid "Are you sure you want to delete"
+msgstr "Are you sure you want to delete"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Task Type"
+msgstr "Task Type"
+
+msgid "customers.Customer"
+msgstr "Customer"
+
+msgid "Is Recurring"
+msgstr "Is Recurring"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Show"
+msgstr "Show"
+
+msgid "per page"
+msgstr "per page"
+
+msgid "Showing %(start)s-%(end)s of %(total)s"
+msgstr "Showing %(start)s-%(end)s of %(total)s"
+
+msgid "No items yet"
+msgstr "No items yet"
+
+msgid "Add your first item to get started"
+msgstr "Add your first item to get started"
+
+#: templates - task add/edit
+msgid "Add Task"
+msgstr "Add Task"
+
+msgid "Edit Task"
+msgstr "Edit Task"
+
+msgid "Select..."
+msgstr "Select..."
+
+msgid "Duration Minutes"
+msgstr "Duration Minutes"
+
+msgid "Reminder Before Minutes"
+msgstr "Reminder Before Minutes"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Danger Zone"
+msgstr "Danger Zone"
+
+msgid "Are you sure?"
+msgstr "Are you sure?"
+
+#: templates - settings
+msgid "Module configuration"
+msgstr "Module configuration"
+
+msgid "Default Reminder Minutes"
+msgstr "Default Reminder Minutes"
+
+msgid "Auto Create Follow Up"
+msgstr "Auto Create Follow Up"
+
+msgid "Save Settings"
+msgstr "Save Settings"
+
+#: templates - calendar
+msgid "Mon"
+msgstr "Mon"
+
+msgid "Tue"
+msgstr "Tue"
+
+msgid "Wed"
+msgstr "Wed"
+
+msgid "Thu"
+msgstr "Thu"
+
+msgid "Fri"
+msgstr "Fri"
+
+msgid "Sat"
+msgstr "Sat"
+
+msgid "Sun"
+msgstr "Sun"
+
+msgid "January"
+msgstr "January"
+
+msgid "February"
+msgstr "February"
+
+msgid "March"
+msgstr "March"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "May"
+
+msgid "June"
+msgstr "June"
+
+msgid "July"
+msgstr "July"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "October"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "December"
+
+msgid "No tasks for this day"
+msgstr "No tasks for this day"
+
+#: templates - task detail
+msgid "Task Details"
+msgstr "Task Details"
+
+msgid "Overdue"
+msgstr "Overdue"
+
+msgid "Today"
+msgstr "Today"
+
+msgid "Duration"
+msgstr "Duration"
+
+msgid "min"
+msgstr "min"
+
+msgid "Reminder"
+msgstr "Reminder"
+
+msgid "min before"
+msgstr "min before"
+
+msgid "Created"
+msgstr "Created"
+
+msgid "Result / Outcome"
+msgstr "Result / Outcome"
+
+msgid "Complete"
+msgstr "Complete"
+
+msgid "Reopen"
+msgstr "Reopen"
+
+msgid "Close"
+msgstr "Close"
