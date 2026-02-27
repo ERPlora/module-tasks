@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
-from apps.accounts.decorators import login_required
+from apps.accounts.decorators import login_required, permission_required
 from apps.core.htmx import htmx_view
 from apps.core.services import export_to_csv, export_to_excel
 from apps.modules_runtime.navigation import with_module_nav
@@ -202,6 +202,7 @@ def tasks_bulk_action(request):
 # ======================================================================
 
 @login_required
+@permission_required('tasks.manage_settings')
 @with_module_nav('tasks', 'settings')
 @htmx_view('tasks/pages/settings.html', 'tasks/partials/settings_content.html')
 def settings_view(request):
