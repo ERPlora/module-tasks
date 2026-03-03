@@ -31,3 +31,18 @@ PERMISSIONS = [
     'tasks.complete_task',
     'tasks.manage_settings',
 ]
+
+ROLE_PERMISSIONS = {
+    "admin": ["*"],
+    "manager": [
+        "add_task",
+        "change_task",
+        "complete_task",
+        "view_task",
+    ],
+    "employee": [
+        "add_task",
+        "complete_task",
+        "view_task",
+    ],
+}
