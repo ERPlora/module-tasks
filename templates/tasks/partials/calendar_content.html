@@ -135,8 +135,7 @@ function tasksCalendar(year, month, todayStr) {
         get selectedDateLabel() {
             if (!this.selectedDate) return '';
             const d = new Date(this.selectedDate + 'T00:00:00');
-            return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        },
+            return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
 
         buildCalendar() {
             const days = [];
@@ -157,7 +156,7 @@ function tasksCalendar(year, month, todayStr) {
                     dateStr: this.formatDate(d),
                     isCurrentMonth: false,
                     isToday: this.formatDate(d) === this.today
-                });
+                },
             }
 
             // Current month days
@@ -168,7 +167,7 @@ function tasksCalendar(year, month, todayStr) {
                     dateStr: this.formatDate(d),
                     isCurrentMonth: true,
                     isToday: this.formatDate(d) === this.today
-                });
+                },
             }
 
             // Next month days to fill grid (6 rows max)
@@ -180,7 +179,7 @@ function tasksCalendar(year, month, todayStr) {
                     dateStr: this.formatDate(d),
                     isCurrentMonth: false,
                     isToday: this.formatDate(d) === this.today
-                });
+                },
             }
 
             this.calendarDays = days;
@@ -237,6 +236,6 @@ function tasksCalendar(year, month, todayStr) {
             this.selectedDate = null;
             this.fetchTasks();
         }
-    };
+    },
 }
 </script>

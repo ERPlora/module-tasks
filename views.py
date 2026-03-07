@@ -3,6 +3,8 @@ Tasks Module Views
 """
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
+from django.http import HttpResponse
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, render as django_render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -113,6 +115,7 @@ def tasks_list(request):
     }
 
 @login_required
+@htmx_view('tasks/pages/task_add.html', 'tasks/partials/task_add_content.html')
 def task_add(request):
     hub_id = request.session.get('hub_id')
     if request.method == 'POST':
@@ -148,10 +151,13 @@ def task_add(request):
         obj.recurrence_rule = recurrence_rule
         obj.reminder_before_minutes = reminder_before_minutes
         obj.save()
-        return _render_tasks_list(request, hub_id)
-    return django_render(request, 'tasks/partials/panel_task_add.html', {})
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('tasks:tasks_list')
+        return response
+    return {}
 
 @login_required
+@htmx_view('tasks/pages/task_edit.html', 'tasks/partials/task_edit_content.html')
 def task_edit(request, pk):
     hub_id = request.session.get('hub_id')
     obj = get_object_or_404(Task, pk=pk, hub_id=hub_id, is_deleted=False)
@@ -173,7 +179,7 @@ def task_edit(request, pk):
         obj.reminder_before_minutes = int(request.POST.get('reminder_before_minutes', 0) or 0)
         obj.save()
         return _render_tasks_list(request, hub_id)
-    return django_render(request, 'tasks/partials/panel_task_edit.html', {'obj': obj})
+    return {'obj': obj}
 
 @login_required
 @require_POST

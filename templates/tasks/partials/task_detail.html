@@ -3,7 +3,7 @@
 <!-- Header -->
 <div class="side-sheet-header">
     <h3 class="sheet-title">{% trans "Task Details" %}</h3>
-    <button class="sheet-close" @click="closePanel()">
+    <button class="sheet-close">
         {% icon "close-outline" %}
     </button>
 </div>
@@ -147,8 +147,7 @@
             <button class="btn btn-sm color-success"
                     hx-post="{% url 'tasks:complete' task_id=task.id %}"
                     hx-target="#datatable-body"
-                    hx-swap="innerHTML"
-                    @click="closePanel()">
+                    hx-swap="innerHTML">
                 {% icon "checkmark-circle-outline" %}
                 {% trans "Complete" %}
             </button>
@@ -156,19 +155,18 @@
             <button class="btn btn-sm btn-outline"
                     hx-post="{% url 'tasks:reopen' task_id=task.id %}"
                     hx-target="#datatable-body"
-                    hx-swap="innerHTML"
-                    @click="closePanel()">
+                    hx-swap="innerHTML">
                 {% icon "refresh-outline" %}
                 {% trans "Reopen" %}
             </button>
             {% endif %}
         </div>
         <div class="flex gap-2">
-            <button type="button" class="btn btn-ghost btn-sm" @click="closePanel()">
+            <button type="button" class="btn btn-ghost btn-sm">
                 {% trans "Close" %}
             </button>
             <button class="btn btn-sm color-primary"
-                    @click="openPanel('{% url 'tasks:edit' task_id=task.id %}')">
+                    hx-get="{% url 'tasks:edit' task_id=task.id %}" hx-target="#main-content-area" hx-push-url="true">
                 {% icon "create-outline" %}
                 {% trans "Edit" %}
             </button>
