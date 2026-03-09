@@ -26,7 +26,7 @@
         {% endif %}
     <!-- Form -->
     <form id="add-task-form"
-          hx-post="{% url 'tasks:task_add' %}" class="max-w-2xl">
+          hx-post="{% url 'tasks:task_add' %}">
         {% csrf_token %}
         <div class="card mb-4">
             <div class="card-body flex flex-col gap-4">
