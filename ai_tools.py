@@ -111,3 +111,70 @@ class UpdateTaskStatus(AssistantTool):
             t.result = args['result']
         t.save()
         return {"id": str(t.id), "status": t.status, "updated": True}
+
+
+@register_tool
+class UpdateTask(AssistantTool):
+    name = "update_task"
+    description = "Update a task's full fields including title, description, type, priority, due date, and assignment."
+    module_id = "tasks"
+    required_permission = "tasks.change_task"
+    requires_confirmation = True
+    parameters = {
+        "type": "object",
+        "properties": {
+            "task_id": {"type": "string"},
+            "title": {"type": "string"}, "description": {"type": "string"},
+            "task_type": {"type": "string", "description": "task, call, meeting, email, follow_up"},
+            "priority": {"type": "string", "description": "low, medium, high, urgent"},
+            "status": {"type": "string", "description": "pending, in_progress, completed, cancelled"},
+            "due_date": {"type": "string"}, "assigned_to": {"type": "string"},
+            "location": {"type": "string"}, "duration_minutes": {"type": "integer"},
+            "result": {"type": "string"},
+        },
+        "required": ["task_id"],
+        "additionalProperties": False,
+    }
+
+    def execute(self, args, request):
+        from django.utils import timezone
+        from tasks.models import Task
+        try:
+            t = Task.objects.get(id=args['task_id'])
+        except Task.DoesNotExist:
+            return {"error": "Task not found"}
+        for field in ('title', 'description', 'task_type', 'priority', 'due_date', 'location', 'duration_minutes', 'result'):
+            if field in args:
+                setattr(t, field, args[field])
+        if 'assigned_to' in args:
+            t.assigned_to = args['assigned_to'] or None
+        if 'status' in args:
+            t.status = args['status']
+            if args['status'] == 'completed' and not t.completed_at:
+                t.completed_at = timezone.now()
+        t.save()
+        return {"id": str(t.id), "title": t.title, "status": t.status, "updated": True}
+
+
+@register_tool
+class DeleteTask(AssistantTool):
+    name = "delete_task"
+    description = "Delete a task by ID."
+    module_id = "tasks"
+    required_permission = "tasks.delete_task"
+    requires_confirmation = True
+    parameters = {
+        "type": "object",
+        "properties": {"task_id": {"type": "string"}},
+        "required": ["task_id"],
+        "additionalProperties": False,
+    }
+
+    def execute(self, args, request):
+        from tasks.models import Task
+        try:
+            t = Task.objects.get(id=args['task_id'])
+        except Task.DoesNotExist:
+            return {"error": "Task not found"}
+        t.delete()
+        return {"deleted": True}
