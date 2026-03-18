@@ -2,8 +2,8 @@ from django.utils.translation import gettext_lazy as _
 
 MODULE_ID = 'tasks'
 MODULE_NAME = _('Tasks')
-MODULE_VERSION = '1.0.0'
-MODULE_ICON = 'checkbox-outline'
+MODULE_VERSION = '1.0.1'
+MODULE_ICON = 'material:task_alt'
 MODULE_DESCRIPTION = _('Task management, calls, meetings and activities')
 MODULE_AUTHOR = 'ERPlora'
 MODULE_CATEGORY = 'productivity'
