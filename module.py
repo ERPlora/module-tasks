@@ -7,6 +7,7 @@ MODULE_ICON = 'material:task_alt'
 MODULE_DESCRIPTION = _('Task management, calls, meetings and activities')
 MODULE_AUTHOR = 'ERPlora'
 MODULE_CATEGORY = 'productivity'
+HAS_MODELS = True
 
 MENU = {
     'label': _('Tasks'),
